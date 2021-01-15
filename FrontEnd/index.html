@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>ElmerVargas-BackendDeveloper</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Personas
+                    </div>
+                    <div class="panel-body">
+                        <p>
+                            <button class="btn btn-default" id="btn-create-person">Nuevo</button>
+                        </p>
+                        <table class="table" id="tbl-persons">
+                            <thead>
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Fecha de nacimiento</th>
+                                    <th>Tipo de documento</th>
+                                    <th>N&uacute;mero de documento</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="panel panel-default hidden" id="div-person-parent">
+                    <div class="panel-body" id="div-person">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-create-person">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Persona</h3>
+                </div>
+                <div class="modal-body-main">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-create-address">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Direcci&oacute;n</h3>
+                </div>
+                <div class="modal-body-main">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-create-email">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Email</h3>
+                </div>
+                <div class="modal-body-main">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-create-phone">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title">Tel&eaacute;fono</h3>
+                </div>
+                <div class="modal-body-main">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+            crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.1.0/mustache.min.js" integrity="sha512-HYiNpwSxYuji84SQbCU5m9kHEsRqwWypXgJMBtbRSumlx1iBB6QaxgEBZHSHEGM+fKyCX/3Kb5V5jeVXm0OglQ==" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js" integrity="sha512-eyHL1atYNycXNXZMDndxrDhNAegH2BDWt1TmkXJPoGf1WLlNYt08CSjkqF5lnCRmdm3IrkHid8s2jOUY4NIZVQ==" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js" integrity="sha512-LGXaggshOkD/at6PFNcp2V2unf9LzFq6LE+sChH7ceMTDP0g2kn6Vxwgg7wkPP7AAtX+lmPqPdxB47A0Nz0cMQ==" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+
+    <script type="text/template" id="tpl-persons">
+        {{#items}}
+        <tr>
+            <td>{{firstname}}</td>
+            <td>{{lastname}}</td>
+            <td>{{birthdate}}</td>
+            <td>{{documenttype}}</td>
+            <td>{{documentnumber}}</td>
+            <td><button class="btn btn-default btn-sm btn-view-person" data-id="{{id}}">Ver</button></td>
+        </tr>
+        {{/items}}
+    </script>
+
+    <script type="text/template" id="tpl-person">
+        <div class="well well-sm">
+            <dl class="dl">
+                <dt>Nombres</dt>
+                <dd>{{firstname}}</dd>
+                <dt>Apellidos</dt>
+                <dd>{{lastname}}</dd>
+                <dt>Fecha de nacimiento</dt>
+                <dd>{{birthdate}}</dd>
+                <dt>Tipo de documento</dt>
+                <dd>{{documenttype}}</dd>
+                <dt>N&uacute;mero de documento</dt>
+                <dd>{{documentnumber}}</dd>
+            </dl>
+            <p class="text-center">
+                <button class="btn btn-default btn-xs btn-edit-person" data-id="{{id}}">Editar</button>
+                <button class="btn btn-default btn-xs btn-remove-person" data-id="{{id}}">Eliminar</button>
+            </p>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Direcciones</div>
+            <div class="panel-body">
+                <p><button class="btn btn-default btn-xs btn-create-address" data-personid="{{id}}">Nuevo</button></p>
+                <table class="table tbl-addresses">
+                    <tbody>
+                        {{#addresses}}
+                        <tr>
+                            <td>{{name}}</td>
+                            <td><button class="btn btn-default btn-xs btn-edit-address" data-id="{{id}}" data-personid="{{personId}}">Editar</button></td>
+                            <td><button class="btn btn-default btn-xs btn-remove-address" data-id="{{id}}" data-personid="{{personId}}">Eliminar</button></td>
+                        </tr>
+                        {{/addresses}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Emails</div>
+            <div class="panel-body">
+                <p><button class="btn btn-default btn-xs btn-create-email" data-personid="{{id}}">Nuevo</button></p>
+                <table class="table tbl-emails">
+                    <tbody>
+                        {{#emails}}
+                        <tr>
+                            <td>{{name}}</td>
+                        </tr>
+                        {{/emails}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Tel&eacute;fonos</div>
+            <div class="panel-body">
+                <p><button class="btn btn-default btn-xs btn-create-phone" data-personid="{{id}}">Nuevo</button></p>
+                <table class="table tbl-phones">
+                    <tbody>
+                        {{#phones}}
+                        <tr>
+                            <td>{{name}}</td>
+                        </tr>
+                        {{/phones}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Foto</div>
+            <div class="panel-body">
+                <img src="data:image/png;base64,{{photo}}" class="img-responsive" />
+                <hr />
+                <p>
+                    <input type="file" accept=".png,.jpg,.jpeg" class="input-photo form-control" />
+                </p>
+            </div>
+            <div class="panel-footer">
+                <button type="button" class="btn btn-primary btn-sm btn-save-photo" data-personid="{{id}}">Guardar</button>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="tpl-create-person">
+        <form class="form-horizontal" id="frm-person" autocomplete="off">
+            <div class="modal-body">
+                <input type="hidden" name="id" value="{{id}}" />
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Nombres</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="firstname" value="{{firstname}}" required="" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Apellidos</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="lastname" value="{{lastname}}" required="" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Fecha de nacimiento</label>
+                    <div class="col-md-8">
+                        <input type="date" class="form-control input-sm input-date" name="birthdate" value="{{birthdate}}" required="" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Tipo de documento</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="documenttype" value="{{documenttype}}" required="" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Nro. de documento</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="documentnumber" value="{{documentnumber}}" required="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-save-person">Guardar</button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/template" id="tpl-create-address">
+        <form class="form-horizontal" id="frm-address" autocomplete="off">
+            <div class="modal-body">
+                <input type="hidden" name="id" value="{{id}}" />
+                <input type="hidden" name="personid" value="{{personId}}" />
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Direcci&oacute;n</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="name" value="{{name}}" required="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-save-address">Guardar</button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/template" id="tpl-create-email">
+        <form class="form-horizontal" id="frm-email" autocomplete="off">
+            <div class="modal-body">
+                <input type="hidden" name="id" value="{{id}}" />
+                <input type="hidden" name="personid" value="{{personId}}" />
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Email</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="name" value="{{name}}" required="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-save-email">Guardar</button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/template" id="tpl-create-phone">
+        <form class="form-horizontal" id="frm-phone" autocomplete="off">
+            <div class="modal-body">
+                <input type="hidden" name="id" value="{{id}}" />
+                <input type="hidden" name="personid" value="{{personId}}" />
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Tel&eacute;fono</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control input-sm" name="name" value="{{name}}" required="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-save-phone">Guardar</button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/javascript">
+
+        const _apibaseurl = 'http://elmervargasdev-001-site1.itempurl.com/retobackdev_api';
+        //const _apibaseurl = 'http://localhost:5000';
+
+        $(document).ready(function () {
+            _loadPersons();
+        });
+
+        $(document).on('click', '#btn-create-person', function (e) {
+            e.preventDefault();
+            _loadEditPerson({});
+        });
+
+        $(document).on('click', '.btn-view-person', function (e) {
+            e.preventDefault();
+            $(this).button('loading');
+            _loadPerson($(this).attr('data-id'));
+        });
+
+        $(document).on('click', '.btn-save-person', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $frm = $('#frm-person');
+            var frmParsley = $frm.parsley(__defaultParsleyForm());
+            var isValid = frmParsley.validate();
+
+            if (!isValid) {
+                return false;
+            }
+
+            $btn.button('loading');
+
+            var person = {
+                id: $frm.find('input[name="id"]').val(),
+                firstname: $frm.find('input[name="firstname"]').val(),
+                lastname: $frm.find('input[name="lastname"]').val(),
+                birthdate: $frm.find('input[name="birthdate"]').val(),
+                documenttype: $frm.find('input[name="documenttype"]').val(),
+                documentnumber: $frm.find('input[name="documentnumber"]').val(),
+            };
+
+            $.ajax({
+                contentType: 'application/json',
+                type: isNaN(parseInt(person.id)) ? 'POST' : 'PUT',
+                url: _apibaseurl + '/person',
+                data: JSON.stringify(person),
+                success: function (result) {
+                    _loadPersons();
+                    if (!isNaN(parseInt(person["id"]))) {
+                        _loadPerson(person["id"]);
+                    } else {
+                        $('#div-person-parent').addClass('hidden');
+                    }
+                    $('#modal-create-person').modal('hide');
+                    $btn.button('reset');
+                }
+            });
+
+        });
+
+        $(document).on('click', '.btn-edit-person', function (e) {
+            e.preventDefault();
+            $(this).button('loading');
+            $.get(_apibaseurl + '/person/' + $(this).attr('data-id'), function (data) {
+                data["birthdate"] = moment(data["birthdate"], 'YYYY-MM-DD[T]HH:mm:ss').format("YYYY-MM-DD");
+                _loadEditPerson(data);
+                $(this).button('reset');
+            });
+        });
+
+        $(document).on('click', '.btn-remove-person', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            bootbox.confirm({
+                title: "Confirmación",
+                message: "Está seguro de eliminar la persona?",
+                buttons: {
+                    confirm: {
+                        label: 'Eliminar',
+                        className: 'btn-danger'
+                    },
+                    cancel: {
+                        label: 'Cancelar',
+                        className: 'btn-default'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        $btn.button('loading');
+                        $.ajax({
+                            contentType: 'application/json',
+                            type: 'DELETE',
+                            url: _apibaseurl + '/person/' + $btn.attr('data-id'),
+                            success: function (result) {
+                                _loadPersons();
+                                $('#div-person-parent').addClass('hidden');
+                                $btn.button('reset');
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-create-address', function (e) {
+            e.preventDefault();
+            _loadEditAddress({ personId: $(this).attr('data-personid') });
+        });
+
+        $(document).on('click', '.btn-edit-address', function (e) {
+            e.preventDefault();
+            $(this).button('loading');
+            var personId = $(this).attr('data-personid');
+            $.get(_apibaseurl + '/address/' + $(this).attr('data-id'), function (data) {
+                data["personId"] = personId;
+                _loadEditAddress(data);
+                $(this).button('reset');
+            });
+        });
+
+        $(document).on('click', '.btn-save-address', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $frm = $('#frm-address');
+            var frmParsley = $frm.parsley(__defaultParsleyForm());
+            var isValid = frmParsley.validate();
+
+            if (!isValid) {
+                return false;
+            }
+
+            $btn.button('loading');
+
+            var model = {
+                id: $frm.find('input[name="id"]').val(),
+                personId: $frm.find('input[name="personid"]').val(),
+                name: $frm.find('input[name="name"]').val(),
+            };
+
+            $.ajax({
+                contentType: 'application/json',
+                type: isNaN(parseInt(model.id)) ? 'POST' : 'PUT',
+                url: _apibaseurl + '/address',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    _loadPerson(model["personId"]);
+                    $('#modal-create-address').modal('hide');
+                    $btn.button('reset');
+                }
+            });
+
+        });
+
+        $(document).on('click', '.btn-remove-address', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            bootbox.confirm({
+                title: "Confirmación",
+                message: "Está seguro de eliminar la dirección?",
+                buttons: {
+                    confirm: {
+                        label: 'Eliminar',
+                        className: 'btn-danger'
+                    },
+                    cancel: {
+                        label: 'Cancelar',
+                        className: 'btn-default'
+                    }
+                },
+                callback: function (result) {
+                    $btn.button('loading');
+                    $.ajax({
+                        contentType: 'application/json',
+                        type: 'DELETE',
+                        url: _apibaseurl + '/address/' + $btn.attr('data-id'),
+                        success: function (result) {
+                            _loadPerson($btn.attr('data-personid'));
+                            $btn.button('reset');
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-create-email', function (e) {
+            e.preventDefault();
+            _loadEditEmail({ personId: $(this).attr('data-personid') });
+        });
+
+        $(document).on('click', '.btn-save-email', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $frm = $('#frm-email');
+            var frmParsley = $frm.parsley(__defaultParsleyForm());
+            var isValid = frmParsley.validate();
+
+            if (!isValid) {
+                return false;
+            }
+
+            $btn.button('loading');
+
+            var model = {
+                id: $frm.find('input[name="id"]').val(),
+                personId: $frm.find('input[name="personid"]').val(),
+                name: $frm.find('input[name="name"]').val(),
+            };
+
+            $.ajax({
+                contentType: 'application/json',
+                type: 'POST',
+                url: _apibaseurl + '/email',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    _loadPerson(model["personId"]);
+                    $('#modal-create-email').modal('hide');
+                    $btn.button('reset');
+                }
+            });
+
+        });
+
+        $(document).on('click', '.btn-create-phone', function (e) {
+            e.preventDefault();
+            _loadEditPhone({ personId: $(this).attr('data-personid') });
+        });
+
+        $(document).on('click', '.btn-save-phone', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var $frm = $('#frm-phone');
+            var frmParsley = $frm.parsley(__defaultParsleyForm());
+            var isValid = frmParsley.validate();
+
+            if (!isValid) {
+                return false;
+            }
+
+            $btn.button('loading');
+
+            var model = {
+                id: $frm.find('input[name="id"]').val(),
+                personId: $frm.find('input[name="personid"]').val(),
+                name: $frm.find('input[name="name"]').val(),
+            };
+
+            $.ajax({
+                contentType: 'application/json',
+                type: 'POST',
+                url: _apibaseurl + '/phone',
+                data: JSON.stringify(model),
+                success: function (result) {
+                    _loadPerson(model["personId"]);
+                    $('#modal-create-phone').modal('hide');
+                    $btn.button('reset');
+                }
+            });
+
+        });
+
+        $(document).on('click', '.btn-save-photo', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var fileData = new FormData();
+            var $filephoto = $('input[type="file"].input-photo');
+            if ($filephoto.length && $filephoto.get(0) && $filephoto.get(0).files[0]) {
+
+                $btn.button('loading');
+
+                fileData.append($filephoto.get(0).files[0].name, $filephoto.get(0).files[0]);
+                $.ajax({
+                    url: _apibaseurl + '/person/' + $btn.attr('data-personid'),
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: fileData,
+                    success: function (result) {
+                        _loadPerson($btn.attr('data-personid'));
+                        $btn.button('reset');
+                    },
+                    error: function (err) {
+                        console.error(err.statusText);
+                    }
+                });
+            } else {
+                bootbox.alert('Seleccione una imagen');
+            }
+        });
+
+
+        const _loadPersons = function () {
+            $.get(_apibaseurl + '/person', function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    data[i]["birthdate"] = moment(data[i]["birthdate"], 'YYYY-MM-DD[T]HH:mm:ss').format("DD/MM/YYYY");
+                }
+                let tpl = $('#tpl-persons').html();
+                let html = Mustache.render(tpl, { items: data });
+                $('#tbl-persons > tbody').html(html);
+            });
+        };
+
+        const _loadPerson = function (id) {
+            $.get(_apibaseurl + '/person/' + id, function (data) {
+                data["birthdate"] = moment(data["birthdate"], 'YYYY-MM-DD[T]HH:mm:ss').format("DD/MM/YYYY");
+                for (var i = 0; i < data["addresses"].length; i++) {
+                    data["addresses"][i]["personId"] = id;
+                }
+                let tpl = $('#tpl-person').html();
+                let html = Mustache.render(tpl, data);
+                $('#div-person').html(html);
+                $('#div-person-parent').removeClass('hidden');
+                $('.btn-view-person').button('reset');
+            });
+        };
+
+        const _loadEditPerson = function (data) {
+            let tpl = $('#tpl-create-person').html();
+            let html = Mustache.render(tpl, data);
+            $('#modal-create-person .modal-body-main').html(html);
+            $('#modal-create-person').modal('show');
+        };
+
+        const _loadEditAddress = function (data) {
+            let tpl = $('#tpl-create-address').html();
+            let html = Mustache.render(tpl, data);
+            $('#modal-create-address .modal-body-main').html(html);
+            $('#modal-create-address').modal('show');
+        };
+
+        const _loadEditEmail = function (data) {
+            let tpl = $('#tpl-create-email').html();
+            let html = Mustache.render(tpl, data);
+            $('#modal-create-email .modal-body-main').html(html);
+            $('#modal-create-email').modal('show');
+        };
+
+        const _loadEditPhone = function (data) {
+            let tpl = $('#tpl-create-phone').html();
+            let html = Mustache.render(tpl, data);
+            $('#modal-create-phone .modal-body-main').html(html);
+            $('#modal-create-phone').modal('show');
+        };
+
+        const __defaultParsleyForm = function () {
+            return {
+                successClass: 'has-success',
+                errorClass: 'has-error',
+                classHandler: function (ps) {
+                    var $el = $(ps.$element);
+                    if (typeof $el.attr('readonly') == 'undefined') {
+                        return $el.closest('.form-group, td');
+                    } else {
+                        return '';
+                    }
+                },
+                errorsContainer: function errorsContainer(ps) {
+                    var $el = $(ps.$element);
+                    var type = $el.attr('type');
+                    if (typeof type != 'undefined') {
+                        type = type.toLowerCase();
+                        if (type == 'checkbox' || type == 'radio') {
+                            return $el.closest('[data-content-group]');
+                        }
+                        if (type == 'file') {
+                            return $el.closest('[data-content-file]');
+                        }
+                    }
+                },
+                //errorsWrapper: '<li class="help-block list-unstyled" style="padding-left:3px;"></li>'
+                errorsWrapper: ''
+            };
+        };
+
+    </script>
+</body>
+</html>
